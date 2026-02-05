@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>ROOT Explorer - Nelson Assis</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 40px; background: #f0f2f5; }
+        .card { background: white; padding: 25px; border-radius: 12px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        ul { text-align: left; column-count: 2; }
+        li { font-size: 14px; color: #333; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Explorador de Arquivos .ROOT</h1>
+        <input type="file" id="arquivoRoot">
+        <button onclick="mapearArquivo()">Mapear Conteúdo Completo</button>
+        <div id="listaVariaveis"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
