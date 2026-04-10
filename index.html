@@ -1,4 +1,99 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy Universal - Auditor ROOT</title>
+    
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; background-color: #1a1a1a; color: #00ff00; padding: 20px; }
+        .container { max-width: 900px; margin: auto; border: 1px solid #333; padding: 20px; border-radius: 8px; background: #000; }
+        h1 { color: #fff; text-align: center; border-bottom: 2px solid #00ff00; padding-bottom: 10px; }
+        input[type="file"] { background: #333; color: white; padding: 10px; width: 100%; margin-top: 20px; cursor: pointer; }
+        #output { white-space: pre-wrap; margin-top: 20px; border: 1px dashed #444; padding: 15px; background: #050505; }
+        .loading { color: yellow; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🕵️ SPY UNIVERSAL v01</h1>
+    <p>Selecione um arquivo .root para auditoria instantânea:</p>
+    
+    <input type="file" id="file-upload" accept=".root">
+    
+    <div id="output">Aguardando arquivo...</div>
+</div>
+
+<py-config>
+    packages = ["uproot", "numpy"]
+</py-config>
+
+<script type="py">
+from js import document, Uint8Array, window
+from pyodide.ffi import create_proxy
+import uproot
+import io
+
+async def process_file(event):
+    output_div = document.getElementById("output")
+    output_div.innerHTML = "<span class='loading'>Inspecionando arquivo... aguarde.</span>"
+    
+    # Captura o arquivo do input
+    file_list = event.target.files
+    if len(file_list) == 0:
+        return
+    
+    file = file_list.item(0)
+    
+    # Converte o arquivo JS para algo que o Python entenda (Binary Stream)
+    array_buffer = await file.arrayBuffer()
+    uint8_array = Uint8Array.new(array_buffer)
+    bytes_io = io.BytesIO(uint8_array.to_bytes())
+    
+    try:
+        with uproot.open(bytes_io) as root_file:
+            report = []
+            report.append("="*80)
+            report.append(f"INVESTIGANDO: {file.name}")
+            report.append("="*80 + "\n")
+
+            objetos = root_file.classnames()
+            arvores = [n for n, c in objetos.items() if c == "TTree"]
+            histogramas = [n for n, c in objetos.items() if "TH" in c]
+
+            if arvores:
+                report.append(f"--- [ENCONTRADAS {len(arvores)} TTREES] ---")
+                for nome_tree in arvores:
+                    clean_name = nome_tree.split(';')[0]
+                    tree = root_file[clean_name]
+                    report.append(f"\n> ÁRVORE: {clean_name}")
+                    report.append(f"  Eventos: {tree.num_entries}")
+                    report.append(f"  {'Branch':<40} | {'Tipo':<20}")
+                    report.append("-" * 65)
+                    for b_name, branch in tree.items():
+                        report.append(f"  {b_name[:39]:<40} | {branch.typename[:19]:<20}")
+            
+            if histogramas:
+                report.append(f"\n--- [ENCONTRADOS {len(histogramas)} HISTOGRAMAS] ---")
+                for nome_hist in histogramas:
+                    report.append(f"  {nome_hist} ({objetos[nome_hist]})")
+
+            report.append("\n" + "="*80)
+            report.append("AUDITORIA CONCLUÍDA.")
+            
+            output_div.innerText = "\n".join(report)
+
+    except Exception as e:
+        output_div.innerHTML = f"<span style='color: red;'>[ERRO] Falha ao ler arquivo: {str(e)}</span>"
+
+# Conecta a função ao evento de mudança do input
+upload_proxy = create_proxy(process_file)
+document.getElementById("file-upload").addEventListener("change", upload_proxy)
+</script>
+
+</body>
 </html>
