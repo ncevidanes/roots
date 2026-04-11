@@ -20,7 +20,7 @@
 <body>
 
 <div class="container">
-   <h1> SPY UNIVERSAL (JSROOT)</h1>
+   <h1>🕵️ SPY UNIVERSAL v02 (JSROOT)</h1>
    <p style="text-align: center; color: #888;">Auditoria Instantânea via JavaScript Nativo</p>
 
    <div class="controls">
@@ -91,139 +91,6 @@
          output.innerHTML = `<span style="color:red">Erro ao ler arquivo: ${err.message}</span>`;
       });
    };
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spy Universal - Auditor ROOT</title>
-    
-    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css" />
-    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-
-    <style>
-        body { font-family: 'Courier New', Courier, monospace; background-color: #0d0d0d; color: #00ff00; padding: 20px; line-height: 1.4; }
-        .container { max-width: 1000px; margin: auto; border: 1px solid #00ff00; padding: 20px; border-radius: 8px; background: #000; box-shadow: 0 0 15px rgba(0, 255, 0, 0.2); }
-        h1 { color: #fff; text-align: center; border-bottom: 2px solid #00ff00; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
-        
-        .controls { display: flex; gap: 10px; margin: 20px 0; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 5px; }
-        input[type="file"] { color: #fff; flex-grow: 1; }
-        
-        button { 
-            background: #00ff00; color: #000; border: none; padding: 12px 25px; 
-            font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.3s;
-        }
-        button:hover { background: #fff; box-shadow: 0 0 10px #fff; }
-        
-        #status-bar { background: #222; padding: 10px; font-size: 0.9em; margin-bottom: 10px; border-left: 5px solid yellow; color: yellow; }
-        
-        #output { 
-            white-space: pre; overflow-x: auto; margin-top: 20px; 
-            border: 1px solid #333; padding: 15px; background: #050505; 
-            min-height: 200px; font-size: 13px; color: #00ff00;
-        }
-        .error { color: #ff4444; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>🕵️ SPY UNIVERSAL v01</h1>
-    
-    <div id="status-bar">⚙️ Inicializando motor Python e bibliotecas (Uproot/Numpy)... Aguarde.</div>
-
-    <div class="controls">
-        <input type="file" id="file-upload" accept=".root">
-        <button id="run-btn" py-click="process_file">EXECUTAR AUDITORIA</button>
-    </div>
-    
-    <div id="output">O console de auditoria aparecerá aqui após o processamento.</div>
-</div>
-
-<py-config>
-    packages = ["uproot", "numpy"]
-</py-config>
-
-<script type="py">
-from js import document, Uint8Array
-import uproot
-import io
-import binascii
-
-# Avisa que o sistema está pronto
-document.getElementById("status-bar").innerHTML = "✅ SISTEMA PRONTO: Carregue o arquivo e clique em Executar."
-document.getElementById("status-bar").style.borderLeft = "5px solid #00ff00"
-document.getElementById("status-bar").style.color = "#00ff00"
-
-async def process_file(event):
-    output_div = document.getElementById("output")
-    file_input = document.getElementById("file-upload")
-    
-    if not file_input.files.item(0):
-        output_div.innerHTML = "<span class='error'>[!] ERRO: Nenhum arquivo selecionado.</span>"
-        return
-
-    output_div.innerHTML = "⏳ Lendo arquivo... (Arquivos grandes podem levar alguns segundos)"
-    
-    try:
-        file = file_input.files.item(0)
-        
-        # Lê os dados do arquivo para memória
-        array_buffer = await file.arrayBuffer()
-        uint8_array = Uint8Array.new(array_buffer)
-        bytes_io = io.BytesIO(uint8_array.to_bytes())
-        
-        # Inicia Auditoria Uproot
-        with uproot.open(bytes_io) as root_file:
-            report = []
-            report.append("="*85)
-            report.append(f"AUDITORIA WEB - ARQUIVO: {file.name}")
-            report.append("="*85 + "\n")
-
-            objetos = root_file.classnames()
-            arvores = [n for n, c in objetos.items() if c == "TTree"]
-            hists = [n for n, c in objetos.items() if "TH" in c]
-
-            # Processando TTrees
-            if arvores:
-                report.append(f"--- [ENCONTRADAS {len(arvores)} TTREES] ---")
-                for nome_tree in arvores:
-                    clean_name = nome_tree.split(';')[0]
-                    tree = root_file[clean_name]
-                    report.append(f"\n> ÁRVORE: {clean_name}")
-                    report.append(f"  Eventos (Entries): {tree.num_entries}")
-                    report.append(f"  {'Branch':<45} | {'Tipo (Typename)':<25}")
-                    report.append("-" * 75)
-                    
-                    # Lista as primeiras 40 branches para evitar lag na tela
-                    branches = list(tree.items())
-                    for b_name, branch in branches[:40]:
-                        tipo = str(branch.typename)
-                        report.append(f"  {b_name[:44]:<45} | {tipo[:24]:<25}")
-                    
-                    if len(branches) > 40:
-                        report.append(f"  ... (+ {len(branches)-40} branches omitidas no resumo)")
-            
-            # Processando Histogramas
-            if hists:
-                report.append(f"\n--- [ENCONTRADOS {len(hists)} HISTOGRAMAS] ---")
-                for h in hists:
-                    report.append(f"  [HIST] {h:<50} | Classe: {objetos[h]}")
-
-            if not arvores and not hists:
-                report.append("[-] Nenhum objeto TTree ou Histograma padrão detectado.")
-
-            report.append("\n" + "="*85)
-            report.append("AUDITORIA CONCLUÍDA COM SUCESSO.")
-            
-            output_div.innerText = "\n".join(report)
-
-    except Exception as e:
-        output_div.innerHTML = f"<span class='error'>[ERRO CRÍTICO] Falha na leitura do arquivo ROOT:</span>\n{str(e)}"
-
 </script>
 
 </body>
