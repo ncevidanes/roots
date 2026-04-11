@@ -1,6 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+   <meta charset="UTF-8">
+   <title>Spy Universal JS - ROOT Auditor</title>
+   <script src="https://root.cern/js/latest/scripts/JSRoot.core.js" type="text/javascript"></script>
+   
+   <style>
+      body { font-family: 'Courier New', monospace; background-color: #0a0a0a; color: #00ff00; padding: 20px; }
+      .container { max-width: 1000px; margin: auto; border: 1px solid #00ff00; padding: 20px; background: #000; box-shadow: 0 0 20px rgba(0,255,0,0.3); }
+      h1 { text-align: center; color: #fff; border-bottom: 2px solid #00ff00; padding-bottom: 10px; }
+      .controls { background: #1a1a1a; padding: 20px; border-radius: 5px; margin: 20px 0; display: flex; gap: 10px; align-items: center; }
+      input[type="file"] { color: white; flex-grow: 1; }
+      #output { background: #050505; border: 1px solid #333; padding: 20px; min-height: 300px; white-space: pre; overflow-x: auto; font-size: 14px; }
+      .tree-name { color: #ffff00; font-weight: bold; }
+      .branch-line { color: #00ff00; }
+      .hist-line { color: #00bfff; }
+   </style>
+</head>
+<body>
+
+<div class="container">
+   <h1>🕵️ SPY UNIVERSAL v02 (JSROOT)</h1>
+   <p style="text-align: center; color: #888;">Auditoria Instantânea via JavaScript Nativo</p>
+
+   <div class="controls">
+      <input type="file" id="fileItem" accept=".root">
+   </div>
+
+   <div id="output">Selecione um arquivo .root para espiar o conteúdo...</div>
+</div>
+
+<script type="module">
+   import { openFile } from 'https://root.cern/js/latest/modules/io.mjs';
+
+   document.getElementById('fileItem').onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const output = document.getElementById('output');
+      output.innerHTML = "⌛ Lendo estrutura binária do ROOT...";
+
+      // JSROOT abre o arquivo local diretamente
+      openFile(file).then(async (f) => {
+         let report = "";
+         report += "=".repeat(80) + "\n";
+         report += `INVESTIGANDO: ${file.name}\n`;
+         report += "=".repeat(80) + "\n\n";
+
+         const keys = f.fKeys;
+         let hasTrees = false;
+         let hasHists = false;
+
+         // 1. Procurar por TTrees
+         report += "--- [ ESTRUTURAS DE DADOS (TTrees) ] ---\n";
+         for (let n = 0; n < keys.length; n++) {
+            const key = keys[n];
+            if (key.fClassName === "TTree") {
+               hasTrees = true;
+               const tree = await f.readObject(key.fName);
+               report += `\n> ÁRVORE: ${key.fName}\n`;
+               report += `  Eventos: ${tree.fEntries}\n`;
+               report += `  ${"Branch".padEnd(40)} | ${"Tipo".padEnd(20)}\n`;
+               report += "-".repeat(65) + "\n";
+               
+               // Listar branches
+               if (tree.fBranches) {
+                  tree.fBranches.arr.forEach(branch => {
+                     report += `  ${branch.fName.substring(0,39).padEnd(40)} | ${branch.fClassName || "Primitive"}\n`;
+                  });
+               }
+            }
+         }
+         if (!hasTrees) report += "[-] Nenhuma TTree encontrada.\n";
+
+         // 2. Procurar por Histogramas
+         report += "\n--- [ MÉTRICAS (Histogramas) ] ---\n";
+         for (let n = 0; n < keys.length; n++) {
+            const key = keys[n];
+            if (key.fClassName.startsWith("TH")) {
+               hasHists = true;
+               report += `  [HIST] ${key.fName.padEnd(40)} | Classe: ${key.fClassName}\n`;
+            }
+         }
+         if (!hasHists) report += "[-] Nenhum histograma encontrado.\n";
+
+         report += "\n" + "=".repeat(80) + "\n";
+         report += "AUDITORIA CONCLUÍDA.";
+         output.innerText = report;
+      }).catch(err => {
+         output.innerHTML = `<span style="color:red">Erro ao ler arquivo: ${err.message}</span>`;
+      });
+   };
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="pt-br">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spy Universal - Auditor ROOT</title>
