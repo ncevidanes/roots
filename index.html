@@ -3,7 +3,6 @@
 <head>
    <meta charset="UTF-8">
    <title>Spy Root Universal - Deep Audit & Viz</title>
-   <script src="https://root.cern/js/latest/scripts/JSRoot.core.js" type="text/javascript"></script>
    
    <style>
       :root {
@@ -22,6 +21,7 @@
 
       .container { max-width: 1400px; margin: auto; }
 
+      /* --- CABEÇALHO --- */
       header {
           background: var(--card-bg);
           border: 1px solid #333;
@@ -38,10 +38,16 @@
           margin-bottom: 25px;
       }
 
-      .header-title h1 { margin: 0; letter-spacing: 3px; font-size: 2em; }
+      .header-title h1 { margin: 0; letter-spacing: 3px; font-size: 2em; text-transform: uppercase; }
       .header-title p { color: var(--ufjf-blue); font-weight: bold; margin-top: 5px; }
 
-      .profile-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 400px; margin: auto; }
+      .profile-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 20px;
+          max-width: 500px;
+          margin: 0 auto;
+      }
 
       .card {
           background: #202020;
@@ -52,22 +58,22 @@
       }
 
       .card h3 { margin-top: 0; color: var(--neon-green); font-size: 1.1em; }
-      .card p { font-size: 0.85em; color: var(--text-gray); line-height: 1.4; }
+      .card p { font-size: 0.85em; color: var(--text-gray); line-height: 1.4; margin-bottom: 15px; }
 
       .lattes-btn {
           display: inline-block;
           text-decoration: none;
           color: #000;
           background: var(--text-gray);
-          padding: 5px 10px;
+          padding: 8px 15px;
           border-radius: 4px;
           font-size: 0.75em;
           font-weight: bold;
           transition: 0.3s;
       }
-      .lattes-btn:hover { background: #fff; }
+      .lattes-btn:hover { background: #fff; transform: scale(1.05); }
 
-      /* --- NOVO LAYOUT DE DUAS COLUNAS --- */
+      /* --- APP LAYOUT --- */
       .app-layout {
          display: grid;
          grid-template-columns: 500px 1fr;
@@ -84,13 +90,13 @@
           flex-direction: column;
       }
 
-      /* Painel de Visualização */
       .viz-panel {
-         background: #fff; /* Fundo branco para o gráfico padrão do ROOT */
+         background: #ffffff; 
          border-radius: 12px;
          border: 1px solid #333;
          min-height: 600px;
          position: relative;
+         overflow: hidden;
       }
 
       #drawing-canvas { width: 100%; height: 100%; }
@@ -106,19 +112,29 @@
           font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.2s; text-transform: uppercase;
       }
 
-      button:hover { background: #fff; transform: translateY(-2px); }
+      button:hover { background: #fff; }
 
       #output { 
           background: #050505; border: 1px solid #222; padding: 20px; white-space: pre; overflow-x: auto; 
           font-family: 'Courier New', monospace; font-size: 11px; height: 500px; overflow-y: scroll; color: #00ff41;
       }
 
-      /* Estilo para os itens clicáveis no log */
       .click-hist { color: #00ff00; text-decoration: underline; cursor: pointer; font-weight: bold; }
       .click-hist:hover { background: #1a331a; }
 
       .status-light { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #555; margin-right: 8px; }
       .active { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+      .project-description {
+         margin-top: 25px;
+         padding: 15px;
+         background: rgba(0, 255, 0, 0.03);
+         border-radius: 8px;
+         font-style: italic;
+         color: #ccc;
+         text-align: center;
+         font-size: 0.9em;
+      }
    </style>
 </head>
 <body>
@@ -137,6 +153,10 @@
             <a href="http://lattes.cnpq.br/1152265127430881" target="_blank" class="lattes-btn">Currículo Lattes</a>
          </div>
       </div>
+
+      <div class="project-description">
+         "Ferramenta de auditoria agnóstica para arquivos ROOT, desenvolvida para varredura profunda de TTrees, Typenames e Histogramas em ambientes de Física de Altas Energias."
+      </div>
    </header>
 
    <div class="app-layout">
@@ -144,61 +164,52 @@
          <div class="controls">
             <input type="file" id="fileItem" accept=".root">
             <button id="btn-audit">Auditar</button>
-            <button id="btn-csv" style="background: var(--ufjf-blue);">CSV</button>
+            <button id="btn-csv" style="background: var(--ufjf-blue);">Exportar CSV</button>
          </div>
 
          <div style="margin-bottom: 10px; font-size: 0.85em;">
             <span id="status-light" class="status-light"></span>
-            <span id="status-text" style="color: #888;">Pronto para análise.</span>
+            <span id="status-text" style="color: #888;">Aguardando arquivo...</span>
          </div>
 
-         <div id="output">Selecione um arquivo .root. Clique em [HIST] para plotar.</div>
+         <div id="output">Selecione um arquivo .root para iniciar a investigação técnica.</div>
       </div>
 
       <div class="viz-panel">
          <div id="drawing-canvas"></div>
-         <div id="canvas-msg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; pointer-events: none;">
-            Os gráficos interativos aparecerão aqui.
+         <div id="canvas-msg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; text-align: center;">
+            Os histogramas clicados aparecerão aqui.<br><small>(Interação via JSROOT ES6 Modules)</small>
          </div>
       </div>
    </div>
 </div>
 
 <script type="module">
-   // Importação dos módulos necessários do JSROOT
-   import { openFile, draw } from 'https://root.cern/js/latest/modules/main.mjs';
+   import { openFile, draw, cleanup } from 'https://root.cern/js/latest/modules/main.mjs';
 
    let auditData = [];
    let currentFile = null;
    let currentFileName = "auditoria";
 
-   // Função global para ser chamada via clique no HTML gerado
+   // Função para plotar histogramas (Global)
    window.plotObject = async function(name) {
-      const canvasMsg = document.getElementById('canvas-msg');
-      if (canvasMsg) canvasMsg.style.display = 'none';
+      const msg = document.getElementById('canvas-msg');
+      if (msg) msg.style.display = 'none';
       
       try {
+         cleanup("drawing-canvas"); // Gerenciamento de memória
+         document.getElementById('drawing-canvas').innerHTML = ""; 
+
          const obj = await currentFile.readObject(name);
-         // Desenha o objeto no canvas. O "hist" é a opção de desenho padrão.
-         await draw("drawing-canvas", obj, "hist");
+         if (obj) {
+            await draw("drawing-canvas", obj, "colz");
+         }
       } catch (e) {
-         console.error("Erro ao desenhar:", e);
+         console.error("Erro ao desenhar objeto:", e);
       }
    }
 
-   function downloadCSV() {
-      if (auditData.length === 0) return;
-      let csvContent = "data:text/csv;charset=utf-8,Tipo,Caminho,Info\n";
-      auditData.forEach(row => { csvContent += `${row.type},"${row.name}","${row.info}"\n`; });
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `${currentFileName}_audit.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-   }
-
+   // Lógica de Auditoria Profunda
    function inspectBranches(branch, prefix, reportAcc) {
       const type = branch.fClassName || branch.fType || "Primitive";
       const isJagged = (type.includes("vector") || type.includes("[]")) ? " [JAGGED]" : "";
@@ -221,26 +232,25 @@
       const statusLight = document.getElementById('status-light');
       const file = fileInput.files[0];
 
-      if (!file) { alert("Selecione um arquivo!"); return; }
+      if (!file) return;
 
       currentFileName = file.name.split('.')[0];
       auditData = []; 
-      output.innerText = "⌛ Realizando Deep Scan...";
+      output.innerText = "⌛ Mapeando hierarquia binária...";
       statusLight.classList.add('active');
-      statusText.innerText = "Escaneando arquivo...";
+      statusText.innerText = "Processando...";
 
       try {
          currentFile = await openFile(file);
-         let reportHTML = `INVESTIGANDO: ${file.name}\n${"=".repeat(90)}\n\n`;
+         let reportHTML = `INVESTIGANDO: ${file.name}\n${"=".repeat(95)}\n\n`;
 
-         const keys = currentFile.fKeys;
-         
-         for (let key of keys) {
+         // Scan de TTrees
+         for (let key of currentFile.fKeys) {
             if (key.fClassName === "TTree") {
                const tree = await currentFile.readObject(key.fName);
                reportHTML += `> ÁRVORE: ${key.fName} (Eventos: ${tree.fEntries})\n`;
                reportHTML += `  ${"Branch".padEnd(62)} | ${"Tipo".padEnd(30)}\n`;
-               reportHTML += "-".repeat(90) + "\n";
+               reportHTML += "-".repeat(95) + "\n";
                
                let reportAcc = { html: "" };
                if (tree.fBranches && tree.fBranches.arr) {
@@ -250,12 +260,12 @@
             }
          }
 
+         // Scan de Histogramas
          async function scanHists(dir, path = "") {
             const keys = dir.fKeys || [];
             for (let key of keys) {
                const fullPath = path === "" ? key.fName : `${path}/${key.fName}`;
                if (key.fClassName.startsWith("TH")) {
-                  // Aqui criamos o link clicável
                   reportHTML += `[HIST] <span class="click-hist" onclick="plotObject('${fullPath}')">${fullPath.padEnd(50)}</span> | ${key.fClassName}\n`;
                   auditData.push({type: "Histogram", name: fullPath, info: key.fClassName});
                } else if (key.fClassName.startsWith("TDirectory")) {
@@ -268,9 +278,7 @@
          reportHTML += `--- [ ESTRUTURA DE HISTOGRAMAS (CLIQUE PARA PLOTAR) ] ---\n`;
          await scanHists(currentFile);
 
-         reportHTML += "\n" + "=".repeat(90) + "\nAUDITORIA CONCLUÍDA.";
-         
-         // Usamos innerHTML para renderizar os links clicáveis
+         reportHTML += "\n" + "=".repeat(95) + "\nAUDITORIA CONCLUÍDA.";
          output.innerHTML = reportHTML;
          statusText.innerText = "Concluído.";
          statusLight.classList.remove('active');
@@ -282,7 +290,16 @@
    }
 
    document.getElementById('btn-audit').onclick = runAudit;
-   document.getElementById('btn-csv').onclick = downloadCSV;
+   // Função CSV mantida
+   document.getElementById('btn-csv').onclick = () => {
+      if (auditData.length === 0) return;
+      let csv = "Tipo,Caminho,Info\n";
+      auditData.forEach(r => csv += `${r.type},"${r.name}","${r.info}"\n`);
+      const link = document.createElement("a");
+      link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+      link.download = `${currentFileName}_audit.csv`;
+      link.click();
+   };
 </script>
 
 </body>
