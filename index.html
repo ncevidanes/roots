@@ -2,81 +2,294 @@
 <html lang="pt-br">
 <head>
    <meta charset="UTF-8">
-   <title>Spy Universal JS - Full Audit</title>
+   <title>Spy Universal v03 - UFJF Audit Tool</title>
    <script src="https://root.cern/js/latest/scripts/JSRoot.core.js" type="text/javascript"></script>
+   
    <style>
-      body { font-family: 'Courier New', monospace; background-color: #0a0a0a; color: #00ff00; padding: 20px; }
-      .container { max-width: 1100px; margin: auto; border: 1px solid #00ff00; padding: 20px; background: #000; }
-      h1 { text-align: center; color: #fff; border-bottom: 2px solid #00ff00; }
-      #output { background: #050505; border: 1px solid #333; padding: 20px; white-space: pre; overflow-x: auto; font-size: 12px; height: 600px; overflow-y: scroll; }
-      .controls { margin-bottom: 20px; background: #1a1a1a; padding: 15px; }
+      :root {
+         --neon-green: #00ff00;
+         --dark-bg: #0a0a0a;
+         --card-bg: #161616;
+         --text-gray: #b0b0b0;
+         --ufjf-blue: #00bfff;
+      }
+
+      body { 
+         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+         background-color: var(--dark-bg); 
+         color: white; 
+         padding: 20px; 
+         margin: 0;
+      }
+
+      .container { max-width: 1200px; margin: auto; }
+
+      /* --- CABEÇALHO ACADÊMICO --- */
+      header {
+         background: var(--card-bg);
+         border: 1px solid #333;
+         border-radius: 12px;
+         padding: 30px;
+         margin-bottom: 30px;
+         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+
+      .header-title {
+         text-align: center;
+         border-bottom: 2px solid var(--neon-green);
+         padding-bottom: 15px;
+         margin-bottom: 25px;
+      }
+
+      .header-title h1 { margin: 0; letter-spacing: 3px; color: #fff; font-size: 2em; }
+      .header-title p { color: var(--ufjf-blue); font-weight: bold; margin-top: 5px; }
+
+      .profile-grid {
+         display: grid;
+         grid-template-columns: 1fr 1fr 1fr;
+         gap: 20px;
+      }
+
+      .card {
+         background: #202020;
+         padding: 20px;
+         border-radius: 8px;
+         border-top: 3px solid var(--neon-green);
+         display: flex;
+         flex-direction: column;
+         justify-content: space-between;
+      }
+
+      .card h3 { margin-top: 0; color: var(--neon-green); font-size: 1.1em; height: 40px; }
+      .card p { font-size: 0.85em; color: var(--text-gray); line-height: 1.4; margin-bottom: 15px; }
+
+      .lattes-btn {
+         display: inline-block;
+         text-decoration: none;
+         color: #000;
+         background: var(--text-gray);
+         padding: 5px 10px;
+         border-radius: 4px;
+         font-size: 0.75em;
+         font-weight: bold;
+         text-align: center;
+         transition: 0.3s;
+      }
+
+      .lattes-btn:hover { background: #fff; }
+
+      .project-description {
+         margin-top: 25px;
+         padding: 15px;
+         background: rgba(0, 255, 0, 0.03);
+         border-radius: 8px;
+         font-style: italic;
+         color: #ccc;
+         text-align: center;
+         font-size: 0.9em;
+         border: 1px solid #222;
+      }
+
+      /* --- APP ENGINE --- */
+      .main-app {
+         background: var(--card-bg);
+         padding: 25px;
+         border-radius: 12px;
+         border: 1px solid #333;
+      }
+
+      .controls { 
+         display: flex; 
+         gap: 15px; 
+         margin-bottom: 20px; 
+         align-items: center;
+         flex-wrap: wrap;
+      }
+
+      input[type="file"] { 
+         background: #252525; 
+         color: white; 
+         padding: 10px; 
+         border-radius: 5px; 
+         border: 1px solid #444;
+         flex-grow: 1;
+      }
+      
+      button { 
+         background: var(--neon-green); 
+         color: black; 
+         border: none; 
+         padding: 12px 25px; 
+         font-weight: bold; 
+         cursor: pointer; 
+         border-radius: 5px; 
+         transition: 0.2s;
+         text-transform: uppercase;
+      }
+
+      button:hover { background: #fff; transform: translateY(-2px); }
+      button#btn-csv { background: var(--ufjf-blue); }
+
+      #output { 
+         background: #050505; 
+         border: 1px solid #222; 
+         padding: 20px; 
+         white-space: pre; 
+         overflow-x: auto; 
+         font-family: 'Courier New', monospace;
+         font-size: 13px; 
+         height: 500px; 
+         overflow-y: scroll; 
+         color: #00ff41;
+      }
+
+      .status-light { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #555; margin-right: 8px; }
+      .active { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+      @media (max-width: 800px) {
+         .profile-grid { grid-template-columns: 1fr; }
+      }
    </style>
 </head>
 <body>
 
 <div class="container">
-   <h1> SPY UNIVERSAL (JSROOT FULL)</h1>
-   <div class="controls">
-      <input type="file" id="fileItem" accept=".root">
+   <header>
+      <div class="header-title">
+         <h1>SPY ROOT UNIVERSAL </h1>
+         <p>Universidade Federal de Juiz de Fora - UFJF</p>
+      </div>
+
+      <div class="profile-grid">
+         <div class="card" style="border-top-color: var(--ufjf-blue);">
+            <h3>👨‍🏫 Orientador</h3>
+            <p><strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong><br>
+            Docente e Pesquisador na UFJF, especialista em processamento de dados científicos.</p>
+            <a href="http://lattes.cnpq.br/5454168673866452" target="_blank" class="lattes-btn">Currículo Lattes</a>
+         </div>
+
+         <div class="card">
+            <h3>👨‍🔬 Pesquisador & Desenvolvedor</h3>
+            <p><strong>Nelson Cevidanes Nascimento de Assis</strong><br>
+            Aluno e pesquisador responsável pela arquitetura de auditoria e lógica de inspeção binária.</p>
+            <a href="http://lattes.cnpq.br/1152265127430881" target="_blank" class="lattes-btn">Currículo Lattes</a>
+         </div>
+
+      <div class="project-description">
+         "Ferramenta de auditoria agnóstica para arquivos ROOT, desenvolvida para varredura profunda de TTrees, Typenames e Histogramas em ambientes de Física de Altas Energias."
+      </div>
+   </header>
+
+   <div class="main-app">
+      <div class="controls">
+         <input type="file" id="fileItem" accept=".root">
+         <button id="btn-audit">Executar Auditoria</button>
+         <button id="btn-csv">Exportar Relatório CSV</button>
+      </div>
+
+      <div style="margin-bottom: 10px; font-size: 0.85em;">
+         <span id="status-light" class="status-light"></span>
+         <span id="status-text" style="color: #888;">Pronto para analisar arquivo.</span>
+      </div>
+
+      <div id="output">Selecione um arquivo .root para iniciar a investigação...</div>
    </div>
-   <div id="output">Selecione o arquivo .root...</div>
 </div>
 
 <script type="module">
    import { openFile } from 'https://root.cern/js/latest/modules/io.mjs';
 
-   document.getElementById('fileItem').onchange = function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+   let auditData = [];
+   let currentFileName = "auditoria";
 
+   function downloadCSV() {
+      if (auditData.length === 0) { alert("Execute a auditoria primeiro!"); return; }
+      let csvContent = "data:text/csv;charset=utf-8,Tipo,Caminho/Nome,Informacao\n";
+      auditData.forEach(row => { csvContent += `${row.type},"${row.name}","${row.info}"\n`; });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", `${currentFileName}_audit.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+   }
+
+   async function runAudit() {
+      const fileInput = document.getElementById('fileItem');
       const output = document.getElementById('output');
-      output.innerText = "⌛ Mapeando estrutura completa... aguarde.";
+      const statusText = document.getElementById('status-text');
+      const statusLight = document.getElementById('status-light');
+      
+      const file = fileInput.files[0];
+      if (!file) { alert("Selecione um arquivo!"); return; }
 
-      openFile(file).then(async (f) => {
+      currentFileName = file.name.split('.')[0];
+      auditData = []; 
+      output.innerText = "⌛ Iniciando varredura profunda (Deep Crawl)...";
+      statusLight.classList.add('active');
+      statusText.innerText = "Acessando blocos binários...";
+
+      try {
+         const f = await openFile(file);
          let report = `INVESTIGANDO: ${file.name}\n${"=".repeat(80)}\n\n`;
 
-         // Função para extrair branches recursivamente
-         function getBranches(obj, indent = "  ") {
-            let res = "";
-            if (obj && obj.fBranches && obj.fBranches.arr) {
-               obj.fBranches.arr.forEach(br => {
-                  res += `${indent}${br.fName.padEnd(50)} | ${br.fClassName || "Primitive"}\n`;
-                  // Tenta descer um nível se houver sub-branches
-                  if (br.fBranches) res += getBranches(br, indent + "  ");
-               });
-            }
-            return res;
-         }
-
-         // Scan de Árvores
-         const keys = f.fKeys;
-         for (let key of keys) {
-            if (key.fClassName === "TTree") {
-               const tree = await f.readObject(key.fName);
-               report += `> ÁRVORE: ${key.fName} (Eventos: ${tree.fEntries})\n`;
-               report += `${"  Branch".padEnd(52)} | Tipo\n${"-".repeat(80)}\n`;
-               report += getBranches(tree);
-               report += "\n";
+         async function scanTrees(path = "") {
+            const dir = (path === "") ? f : await f.readDirectory(path);
+            const keys = dir.fKeys;
+            for (let key of keys) {
+               const fullPath = path === "" ? key.fName : `${path}/${key.fName}`;
+               if (key.fClassName === "TTree") {
+                  const tree = await f.readObject(fullPath);
+                  report += `> ÁRVORE: ${fullPath} (Eventos: ${tree.fEntries})\n`;
+                  auditData.push({type: "TTree", name: fullPath, info: `Entries: ${tree.fEntries}`});
+                  if (tree.fBranches) {
+                     tree.fBranches.arr.forEach(br => {
+                        const tipo = br.fClassName || "Primitive";
+                        report += `  Branch: ${br.fName.padEnd(45)} | ${tipo}\n`;
+                        auditData.push({type: "Branch", name: `${fullPath}/${br.fName}`, info: tipo});
+                     });
+                  }
+                  report += "\n";
+               } else if (key.fClassName.startsWith("TDirectory")) {
+                  await scanTrees(fullPath);
+               }
             }
          }
 
-         // Scan de Histogramas (Busca profunda em diretórios)
-         report += `--- [ ENCONTRADOS HISTOGRAMAS ] ---\n`;
-         let histCount = 0;
-         
-         // O JSROOT armazena histogramas em keys, mas eles podem estar em pastas
-         keys.forEach(key => {
-            if (key.fClassName.startsWith("TH")) {
-               histCount++;
-               report += `[HIST] ${key.fName.padEnd(50)} | ${key.fClassName}\n`;
+         async function scanHistograms(path = "") {
+            const dir = (path === "") ? f : await f.readDirectory(path);
+            const keys = dir.fKeys;
+            for (let key of keys) {
+               const fullPath = path === "" ? key.fName : `${path}/${key.fName}`;
+               if (key.fClassName.startsWith("TH")) {
+                  report += `[HIST] ${fullPath.padEnd(55)} | ${key.fClassName}\n`;
+                  auditData.push({type: "Histogram", name: fullPath, info: key.fClassName});
+               } else if (key.fClassName.startsWith("TDirectory")) {
+                  await scanHistograms(fullPath);
+               }
             }
-         });
+         }
 
-         report += `\nTotal de histogramas na raiz: ${histCount}\n`;
+         await scanTrees();
+         report += `--- [ ESTRUTURA DE HISTOGRAMAS ] ---\n`;
+         await scanHistograms();
+
          report += "\n" + "=".repeat(80) + "\nAUDITORIA CONCLUÍDA.";
          output.innerText = report;
-      });
-   };
+         statusText.innerText = "Análise finalizada.";
+         statusLight.classList.remove('active');
+
+      } catch (err) {
+         output.innerText = "ERRO NA LEITURA: " + err.message;
+         statusText.innerText = "Erro no arquivo.";
+         statusLight.classList.remove('active');
+      }
+   }
+
+   document.getElementById('btn-audit').onclick = runAudit;
+   document.getElementById('btn-csv').onclick = downloadCSV;
 </script>
+
 </body>
 </html>
