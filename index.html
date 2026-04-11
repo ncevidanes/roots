@@ -1,202 +1,567 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
+
 <html lang="pt-br">
+
 <head>
+
    <meta charset="UTF-8">
-   <title>Spy Root Universal - Deep Audit</title>
+
+   <title>Spy Root Universal - Deep Audit & Viz</title>
+
    
+
    <style>
+
       :root {
+
           --neon-green: #00ff00;
+
           --dark-bg: #0a0a0a;
+
           --card-bg: #161616;
+
           --text-gray: #b0b0b0;
+
           --ufjf-blue: #00bfff;
+
       }
 
-      body { font-family: 'Segoe UI', sans-serif; background-color: var(--dark-bg); color: white; padding: 20px; margin: 0; }
+
+      body { 
+
+          font-family: 'Segoe UI', sans-serif; 
+
+          background-color: var(--dark-bg); 
+
+          color: white; padding: 20px; margin: 0;
+
+      }
+
+
       .container { max-width: 1400px; margin: auto; }
 
+
+      /* --- CABEÇALHO --- */
+
       header {
-          background: var(--card-bg); border: 1px solid #333; border-radius: 12px;
-          padding: 30px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
+          background: var(--card-bg);
+
+          border: 1px solid #333;
+
+          border-radius: 12px;
+
+          padding: 30px;
+
+          margin-bottom: 30px;
+
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+
       }
-      .header-title { text-align: center; border-bottom: 2px solid var(--neon-green); padding-bottom: 15px; margin-bottom: 25px; }
+
+
+      .header-title {
+
+          text-align: center;
+
+          border-bottom: 2px solid var(--neon-green);
+
+          padding-bottom: 15px;
+
+          margin-bottom: 25px;
+
+      }
+
+
       .header-title h1 { margin: 0; letter-spacing: 3px; font-size: 2em; text-transform: uppercase; }
+
       .header-title p { color: var(--ufjf-blue); font-weight: bold; margin-top: 5px; }
 
-      .profile-grid { display: grid; grid-template-columns: 1fr; gap: 20px; max-width: 500px; margin: 0 auto; }
-      .card { background: #202020; padding: 20px; border-radius: 8px; border-top: 3px solid var(--neon-green); text-align: center; }
-      .card h3 { margin-top: 0; color: var(--neon-green); font-size: 1.1em; }
-      .card p { font-size: 0.85em; color: var(--text-gray); line-height: 1.4; margin-bottom: 15px; }
-      .lattes-btn {
-          display: inline-block; text-decoration: none; color: #000; background: var(--text-gray);
-          padding: 8px 15px; border-radius: 4px; font-size: 0.75em; font-weight: bold; transition: 0.3s;
+
+      .profile-grid {
+
+          display: grid;
+
+          grid-template-columns: 1fr;
+
+          gap: 20px;
+
+          max-width: 500px;
+
+          margin: 0 auto;
+
       }
+
+
+      .card {
+
+          background: #202020;
+
+          padding: 20px;
+
+          border-radius: 8px;
+
+          border-top: 3px solid var(--neon-green);
+
+          text-align: center;
+
+      }
+
+
+      .card h3 { margin-top: 0; color: var(--neon-green); font-size: 1.1em; }
+
+      .card p { font-size: 0.85em; color: var(--text-gray); line-height: 1.4; margin-bottom: 15px; }
+
+
+      .lattes-btn {
+
+          display: inline-block;
+
+          text-decoration: none;
+
+          color: #000;
+
+          background: var(--text-gray);
+
+          padding: 8px 15px;
+
+          border-radius: 4px;
+
+          font-size: 0.75em;
+
+          font-weight: bold;
+
+          transition: 0.3s;
+
+      }
+
       .lattes-btn:hover { background: #fff; transform: scale(1.05); }
 
-      .app-layout { display: grid; grid-template-columns: 500px 1fr; gap: 25px; margin-top: 20px; }
-      .main-app { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #333; display: flex; flex-direction: column; }
-      .viz-panel { background: #ffffff; border-radius: 12px; border: 1px solid #333; min-height: 650px; position: relative; overflow: hidden; }
+
+      /* --- APP LAYOUT --- */
+
+      .app-layout {
+
+         display: grid;
+
+         grid-template-columns: 500px 1fr;
+
+         gap: 20px;
+
+         margin-top: 20px;
+
+      }
+
+
+      .main-app {
+
+          background: var(--card-bg);
+
+          padding: 25px;
+
+          border-radius: 12px;
+
+          border: 1px solid #333;
+
+          display: flex;
+
+          flex-direction: column;
+
+      }
+
+
+      .viz-panel {
+
+         background: #ffffff; 
+
+         border-radius: 12px;
+
+         border: 1px solid #333;
+
+         min-height: 600px;
+
+         position: relative;
+
+         overflow: hidden;
+
+      }
+
+
       #drawing-canvas { width: 100%; height: 100%; }
 
-      #output { 
-          background: #050505; border: 1px solid #222; padding: 15px; white-space: pre; 
-          overflow-x: auto; font-family: 'Courier New', monospace; font-size: 11px; 
-          height: 500px; overflow-y: scroll; color: #00ff41; margin-top: 15px; 
+
+      .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+
+      input[type="file"] { 
+
+          background: #252525; color: white; padding: 10px; border-radius: 5px; border: 1px solid #444; flex-grow: 1;
+
       }
 
-      button { background: var(--neon-green); color: black; border: none; padding: 12px 15px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; width: 100%; }
-      button:hover { background: #fff; }
       
+
+      button { 
+
+          background: var(--neon-green); color: black; border: none; padding: 12px 20px; 
+
+          font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.2s; text-transform: uppercase;
+
+      }
+
+
+      button:hover { background: #fff; }
+
+
+      #output { 
+
+          background: #050505; border: 1px solid #222; padding: 20px; white-space: pre; overflow-x: auto; 
+
+          font-family: 'Courier New', monospace; font-size: 11px; height: 500px; overflow-y: scroll; color: #00ff41;
+
+      }
+
+
       .click-hist { color: #00ff00; text-decoration: underline; cursor: pointer; font-weight: bold; }
-      .branch-line { color: #00bfff; }
+
+      .click-hist:hover { background: #1a331a; }
+
+
+      .status-light { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #555; margin-right: 8px; }
+
+      .active { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+
+
+      .project-description {
+
+         margin-top: 25px;
+
+         padding: 15px;
+
+         background: rgba(0, 255, 0, 0.03);
+
+         border-radius: 8px;
+
+         font-style: italic;
+
+         color: #ccc;
+
+         text-align: center;
+
+         font-size: 0.9em;
+
+      }
+
    </style>
+
 </head>
+
 <body>
 
+
 <div class="container">
+
    <header>
+
       <div class="header-title">
-         <h1>SPY ROOT UNIVERSAL v06</h1>
-         <p>Auditoria de Hierarquia - Projeto Lorenzetti / ATLAS</p>
+
+         <h1>SPY ROOT UNIVERSAL</h1>
+
+         <p>Unidos Pela Ciência - UFJF</p>
+
       </div>
-      
+
+
       <div class="profile-grid">
+
          <div class="card">
+
             <h3>👨‍🔬 Pesquisador & Desenvolvedor</h3>
-            <p><strong>Nelson Cevidanes Nascimento de Assis</strong><br>Doutorando UFJF responsável pela arquitetura de auditoria.</p>
+
+            <p><strong>Nelson Cevidanes Nascimento de Assis</strong><br>Aluno UFJF responsável pela arquitetura de auditoria.</p>
+
             <a href="http://lattes.cnpq.br/1152265127430881" target="_blank" class="lattes-btn">Currículo Lattes</a>
+
          </div>
+
       </div>
+
+
+      <div class="project-description">
+
+         "Ferramenta de auditoria agnóstica para arquivos ROOT, desenvolvida para varredura profunda de TTrees, Typenames e Histogramas em ambientes de Física de Altas Energias."
+
+      </div>
+
    </header>
 
+
    <div class="app-layout">
+
       <div class="main-app">
-         <input type="file" id="fileItem" accept=".root" style="margin-bottom: 20px; width: 94%; padding: 10px; background: #252525; border: 1px solid #444; color: white;">
-         
-         <div style="display: flex; gap: 10px;">
-             <button id="btn-audit">Investigar Arquivo Slim</button>
-             <button id="btn-csv" style="background: var(--ufjf-blue); width: 40%; color: white;">Exportar CSV</button>
+
+         <div class="controls">
+
+            <input type="file" id="fileItem" accept=".root">
+
+            <button id="btn-audit">Auditar</button>
+
+            <button id="btn-csv" style="background: var(--ufjf-blue);">Exportar CSV</button>
+
          </div>
 
-         <div id="output">Selecione o arquivo reduzido para iniciar a auditoria técnica.</div>
-         <div id="status-text" style="margin-top: 10px; font-size: 0.8em; color: yellow;">Aguardando...</div>
+
+         <div style="margin-bottom: 10px; font-size: 0.85em;">
+
+            <span id="status-light" class="status-light"></span>
+
+            <span id="status-text" style="color: #888;">Aguardando arquivo...</span>
+
+         </div>
+
+
+         <div id="output">Selecione um arquivo .root para iniciar a investigação técnica.</div>
+
       </div>
+
 
       <div class="viz-panel">
+
          <div id="drawing-canvas"></div>
-         <div id="canvas-msg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; text-align:center;">
-            Visualize histogramas clicando na lista de auditoria.<br>
-            <small>JSROOT Engine - CERN/ATLAS</small>
+
+         <div id="canvas-msg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #888; text-align: center;">
+
+            Os histogramas clicados aparecerão aqui.<br><small>(Interação via JSROOT ES6 Modules)</small>
+
          </div>
+
       </div>
+
    </div>
+
 </div>
 
+
 <script type="module">
+
    import { openFile, draw, cleanup } from 'https://root.cern/js/latest/modules/main.mjs';
 
-   let currentFile = null;
+
    let auditData = [];
+
+   let currentFile = null;
+
    let currentFileName = "auditoria";
 
-   // --- O PULO DO GATO: MAPEADOR DE TTREE ---
-   async function auditTree(treeName) {
-      const tree = await currentFile.readObject(treeName);
-      if (!tree) return "";
 
-      let branchList = `> ÁRVORE: ${treeName} (Eventos: ${tree.fEntries})\n`;
-      branchList += `${"Branch".padEnd(60)} | Tipo\n`;
-      branchList += "-".repeat(95) + "\n";
+   // Função para plotar histogramas (Global)
 
-      // Acessando o array interno de branches do ROOT
-      if (tree.fBranches && tree.fBranches.arr) {
-         for (let i = 0; i < tree.fBranches.arr.length; i++) {
-            const branch = tree.fBranches.arr[i];
-            const type = branch.fClassName || "TBranch";
-            branchList += `<span class="branch-line">${branch.fName.padEnd(60)}</span> | ${type}\n`;
-            
-            // Adicionando aos dados do CSV
-            auditData.push({type: "Branch", name: branch.fName, info: type});
-         }
-      } else {
-         branchList += "⚠️ Nenhuma branch detectada no nível primário.\n";
-      }
-      return branchList + "\n";
-   }
+   window.plotObject = async function(name) {
 
-   // --- INVESTIGAÇÃO TÉCNICA ---
-   document.getElementById('btn-audit').onclick = async function() {
-      const fileInput = document.getElementById('fileItem');
-      const output = document.getElementById('output');
-      const status = document.getElementById('status-text');
-      const file = fileInput.files[0];
+      const msg = document.getElementById('canvas-msg');
 
-      if (!file) { alert("Selecione o arquivo!"); return; }
+      if (msg) msg.style.display = 'none';
 
-      auditData = [];
-      currentFileName = file.name.split('.')[0];
-      output.innerText = "⌛ Analisando hierarquia binária profunda...";
-      status.innerText = "Processando...";
+      
 
       try {
-         currentFile = await openFile(file);
-         let report = `INVESTIGANDO: ${file.name}\n${"=".repeat(95)}\n\n`;
 
-         const keys = currentFile.fKeys || [];
-         for (let key of keys) {
-            // Se for TTree, chama o mapeador profundo
-            if (key.fClassName === "TTree") {
-               report += await auditTree(key.fName);
-            }
+         cleanup("drawing-canvas"); // Gerenciamento de memória
+
+         document.getElementById('drawing-canvas').innerHTML = ""; 
+
+
+         const obj = await currentFile.readObject(name);
+
+         if (obj) {
+
+            await draw("drawing-canvas", obj, "colz");
+
          }
 
-         // Scan de Histogramas
-         async function scanHists(dir, path = "") {
-            const hKeys = dir.fKeys || [];
-            for (let k of hKeys) {
-               const fullPath = path === "" ? k.fName : `${path}/${k.fName}`;
-               if (k.fClassName.startsWith("TH")) {
-                  report += `[HIST] <span class="click-hist" onclick="plotObject('${fullPath}')">${fullPath.padEnd(50)}</span> | ${k.fClassName}\n`;
-                  auditData.push({type: "Histogram", name: fullPath, info: k.fClassName});
-               } else if (k.fClassName.startsWith("TDirectory")) {
-                  const subDir = await currentFile.readDirectory(fullPath);
-                  await scanHists(subDir, fullPath);
-               }
-            }
-         }
-         
-         report += `--- [ ESTRUTURA DE HISTOGRAMAS (CLIQUE PARA PLOTAR) ] ---\n`;
-         await scanHists(currentFile);
-         
-         report += "\n" + "=".repeat(95) + "\nAUDITORIA CONCLUÍDA.";
-         output.innerHTML = report;
-         status.innerText = "Mapeamento concluído com sucesso.";
-      } catch (err) {
-         output.innerText = "ERRO NA INVESTIGAÇÃO: " + err.message;
-         status.innerText = "Falha técnica.";
+      } catch (e) {
+
+         console.error("Erro ao desenhar objeto:", e);
+
       }
-   };
 
-   // --- PLOTAGEM ---
-   window.plotObject = async function(name) {
-      document.getElementById('canvas-msg').style.display = 'none';
-      cleanup("drawing-canvas");
-      document.getElementById('drawing-canvas').innerHTML = ""; 
-      const obj = await currentFile.readObject(name);
-      if (obj) await draw("drawing-canvas", obj, "colz");
    }
 
-   // --- CSV ---
+
+   // Lógica de Auditoria Profunda
+
+   function inspectBranches(branch, prefix, reportAcc) {
+
+      const type = branch.fClassName || branch.fType || "Primitive";
+
+      const isJagged = (type.includes("vector") || type.includes("[]")) ? " [JAGGED]" : "";
+
+      const branchName = prefix === "" ? branch.fName : `${prefix}/${branch.fName}`;
+
+      
+
+      reportAcc.html += `  ${branchName.padEnd(60)} | ${type.padEnd(30)}${isJagged}\n`;
+
+      auditData.push({type: "Branch", name: branchName, info: type + isJagged});
+
+
+      if (branch.fBranches && branch.fBranches.arr) {
+
+         branch.fBranches.arr.forEach(sub => {
+
+            inspectBranches(sub, branchName, reportAcc);
+
+         });
+
+      }
+
+   }
+
+
+   async function runAudit() {
+
+      const fileInput = document.getElementById('fileItem');
+
+      const output = document.getElementById('output');
+
+      const statusText = document.getElementById('status-text');
+
+      const statusLight = document.getElementById('status-light');
+
+      const file = fileInput.files[0];
+
+
+      if (!file) return;
+
+
+      currentFileName = file.name.split('.')[0];
+
+      auditData = []; 
+
+      output.innerText = "⌛ Mapeando hierarquia binária...";
+
+      statusLight.classList.add('active');
+
+      statusText.innerText = "Processando...";
+
+
+      try {
+
+         currentFile = await openFile(file);
+
+         let reportHTML = `INVESTIGANDO: ${file.name}\n${"=".repeat(95)}\n\n`;
+
+
+         // Scan de TTrees
+
+         for (let key of currentFile.fKeys) {
+
+            if (key.fClassName === "TTree") {
+
+               const tree = await currentFile.readObject(key.fName);
+
+               reportHTML += `> ÁRVORE: ${key.fName} (Eventos: ${tree.fEntries})\n`;
+
+               reportHTML += `  ${"Branch".padEnd(62)} | ${"Tipo".padEnd(30)}\n`;
+
+               reportHTML += "-".repeat(95) + "\n";
+
+               
+
+               let reportAcc = { html: "" };
+
+               if (tree.fBranches && tree.fBranches.arr) {
+
+                  tree.fBranches.arr.forEach(br => inspectBranches(br, "", reportAcc));
+
+               }
+
+               reportHTML += reportAcc.html + "\n";
+
+            }
+
+         }
+
+
+         // Scan de Histogramas
+
+         async function scanHists(dir, path = "") {
+
+            const keys = dir.fKeys || [];
+
+            for (let key of keys) {
+
+               const fullPath = path === "" ? key.fName : `${path}/${key.fName}`;
+
+               if (key.fClassName.startsWith("TH")) {
+
+                  reportHTML += `[HIST] <span class="click-hist" onclick="plotObject('${fullPath}')">${fullPath.padEnd(50)}</span> | ${key.fClassName}\n`;
+
+                  auditData.push({type: "Histogram", name: fullPath, info: key.fClassName});
+
+               } else if (key.fClassName.startsWith("TDirectory")) {
+
+                  const subDir = await currentFile.readDirectory(fullPath);
+
+                  await scanHists(subDir, fullPath);
+
+               }
+
+            }
+
+         }
+
+
+         reportHTML += `--- [ ESTRUTURA DE HISTOGRAMAS (CLIQUE PARA PLOTAR) ] ---\n`;
+
+         await scanHists(currentFile);
+
+
+         reportHTML += "\n" + "=".repeat(95) + "\nAUDITORIA CONCLUÍDA.";
+
+         output.innerHTML = reportHTML;
+
+         statusText.innerText = "Concluído.";
+
+         statusLight.classList.remove('active');
+
+
+      } catch (err) {
+
+         output.innerText = "ERRO: " + err.message;
+
+         statusLight.classList.remove('active');
+
+      }
+
+   }
+
+
+   document.getElementById('btn-audit').onclick = runAudit;
+
+   // Função CSV mantida
+
    document.getElementById('btn-csv').onclick = () => {
+
       if (auditData.length === 0) return;
+
       let csv = "Tipo,Caminho,Info\n";
+
       auditData.forEach(r => csv += `${r.type},"${r.name}","${r.info}"\n`);
+
       const link = document.createElement("a");
+
       link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+
       link.download = `${currentFileName}_audit.csv`;
+
       link.click();
+
    };
+
 </script>
+
+
 </body>
-</html>
+
+</html> 
