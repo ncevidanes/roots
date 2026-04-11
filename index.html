@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
    <meta charset="UTF-8">
-   <title>Spy Universal v03 - UFJF Audit Tool</title>
+   <title>Spy Universal - UFJF Deep Audit</title>
    <script src="https://root.cern/js/latest/scripts/JSRoot.core.js" type="text/javascript"></script>
    
    <style>
@@ -15,16 +15,13 @@
       }
 
       body { 
-         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+         font-family: 'Segoe UI', sans-serif; 
          background-color: var(--dark-bg); 
-         color: white; 
-         padding: 20px; 
-         margin: 0;
+         color: white; padding: 20px; margin: 0;
       }
 
       .container { max-width: 1200px; margin: auto; }
 
-      /* --- CABEÇALHO ACADÊMICO --- */
       header {
          background: var(--card-bg);
          border: 1px solid #333;
@@ -41,7 +38,7 @@
          margin-bottom: 25px;
       }
 
-      .header-title h1 { margin: 0; letter-spacing: 3px; color: #fff; font-size: 2em; }
+      .header-title h1 { margin: 0; letter-spacing: 3px; font-size: 2em; }
       .header-title p { color: var(--ufjf-blue); font-weight: bold; margin-top: 5px; }
 
       .profile-grid {
@@ -78,19 +75,6 @@
 
       .lattes-btn:hover { background: #fff; }
 
-      .project-description {
-         margin-top: 25px;
-         padding: 15px;
-         background: rgba(0, 255, 0, 0.03);
-         border-radius: 8px;
-         font-style: italic;
-         color: #ccc;
-         text-align: center;
-         font-size: 0.9em;
-         border: 1px solid #222;
-      }
-
-      /* --- APP ENGINE --- */
       .main-app {
          background: var(--card-bg);
          padding: 25px;
@@ -99,56 +83,28 @@
       }
 
       .controls { 
-         display: flex; 
-         gap: 15px; 
-         margin-bottom: 20px; 
-         align-items: center;
-         flex-wrap: wrap;
+         display: flex; gap: 15px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
       }
 
       input[type="file"] { 
-         background: #252525; 
-         color: white; 
-         padding: 10px; 
-         border-radius: 5px; 
-         border: 1px solid #444;
-         flex-grow: 1;
+         background: #252525; color: white; padding: 10px; border-radius: 5px; border: 1px solid #444; flex-grow: 1;
       }
       
       button { 
-         background: var(--neon-green); 
-         color: black; 
-         border: none; 
-         padding: 12px 25px; 
-         font-weight: bold; 
-         cursor: pointer; 
-         border-radius: 5px; 
-         transition: 0.2s;
-         text-transform: uppercase;
+         background: var(--neon-green); color: black; border: none; padding: 12px 25px; 
+         font-weight: bold; cursor: pointer; border-radius: 5px; transition: 0.2s; text-transform: uppercase;
       }
 
       button:hover { background: #fff; transform: translateY(-2px); }
       button#btn-csv { background: var(--ufjf-blue); }
 
       #output { 
-         background: #050505; 
-         border: 1px solid #222; 
-         padding: 20px; 
-         white-space: pre; 
-         overflow-x: auto; 
-         font-family: 'Courier New', monospace;
-         font-size: 13px; 
-         height: 500px; 
-         overflow-y: scroll; 
-         color: #00ff41;
+         background: #050505; border: 1px solid #222; padding: 20px; white-space: pre; overflow-x: auto; 
+         font-family: 'Courier New', monospace; font-size: 12px; height: 550px; overflow-y: scroll; color: #00ff41;
       }
 
       .status-light { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #555; margin-right: 8px; }
       .active { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
-
-      @media (max-width: 800px) {
-         .profile-grid { grid-template-columns: 1fr; }
-      }
    </style>
 </head>
 <body>
@@ -156,43 +112,39 @@
 <div class="container">
    <header>
       <div class="header-title">
-         <h1>SPY ROOT UNIVERSAL </h1>
+         <h1>SPY ROOT UNIVERSAL</h1>
          <p>Universidade Federal de Juiz de Fora - UFJF</p>
       </div>
 
       <div class="profile-grid">
          <div class="card" style="border-top-color: var(--ufjf-blue);">
             <h3>👨‍🏫 Orientador</h3>
-            <p><strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong><br>
-            Docente e Pesquisador na UFJF, especialista em processamento de dados científicos.</p>
+            <p><strong>Prof. Dr. Luciano Manhães de Andrade Filho</strong><br>Docente e Pesquisador na UFJF.</p>
             <a href="http://lattes.cnpq.br/5454168673866452" target="_blank" class="lattes-btn">Currículo Lattes</a>
          </div>
 
          <div class="card">
             <h3>👨‍🔬 Pesquisador & Desenvolvedor</h3>
-            <p><strong>Nelson Cevidanes Nascimento de Assis</strong><br>
-            Aluno e pesquisador responsável pela arquitetura de auditoria e lógica de inspeção binária.</p>
+            <p><strong>Nelson Cevidanes Nascimento de Assis</strong><br>Aluno UFJF responsável pela arquitetura de auditoria.</p>
             <a href="http://lattes.cnpq.br/1152265127430881" target="_blank" class="lattes-btn">Currículo Lattes</a>
          </div>
 
-      <div class="project-description">
-         "Ferramenta de auditoria agnóstica para arquivos ROOT, desenvolvida para varredura profunda de TTrees, Typenames e Histogramas em ambientes de Física de Altas Energias."
       </div>
    </header>
 
    <div class="main-app">
       <div class="controls">
          <input type="file" id="fileItem" accept=".root">
-         <button id="btn-audit">Executar Auditoria</button>
-         <button id="btn-csv">Exportar Relatório CSV</button>
+         <button id="btn-audit">Executar Auditoria Profunda</button>
+         <button id="btn-csv">Exportar CSV</button>
       </div>
 
       <div style="margin-bottom: 10px; font-size: 0.85em;">
          <span id="status-light" class="status-light"></span>
-         <span id="status-text" style="color: #888;">Pronto para analisar arquivo.</span>
+         <span id="status-text" style="color: #888;">Pronto para análise.</span>
       </div>
 
-      <div id="output">Selecione um arquivo .root para iniciar a investigação...</div>
+      <div id="output">Selecione um arquivo .root para iniciar...</div>
    </div>
 </div>
 
@@ -203,8 +155,8 @@
    let currentFileName = "auditoria";
 
    function downloadCSV() {
-      if (auditData.length === 0) { alert("Execute a auditoria primeiro!"); return; }
-      let csvContent = "data:text/csv;charset=utf-8,Tipo,Caminho/Nome,Informacao\n";
+      if (auditData.length === 0) return;
+      let csvContent = "data:text/csv;charset=utf-8,Tipo,Caminho,Info\n";
       auditData.forEach(row => { csvContent += `${row.type},"${row.name}","${row.info}"\n`; });
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
@@ -215,74 +167,86 @@
       document.body.removeChild(link);
    }
 
+   // Função recursiva para "espiar" dentro das branches (Deep Inspection)
+   function inspectBranches(branch, prefix, reportAcc) {
+      const type = branch.fClassName || branch.fType || "Primitive";
+      const isJagged = (type.includes("vector") || type.includes("[]")) ? " [JAGGED]" : "";
+      
+      const branchName = prefix === "" ? branch.fName : `${prefix}/${branch.fName}`;
+      
+      reportAcc.text += `  ${branchName.padEnd(60)} | ${type.padEnd(30)}${isJagged}\n`;
+      auditData.push({type: "Branch", name: branchName, info: type + isJagged});
+
+      // Se a branch tem sub-branches, entra nelas (comportamento do Uproot)
+      if (branch.fBranches && branch.fBranches.arr) {
+         branch.fBranches.arr.forEach(sub => {
+            inspectBranches(sub, branchName, reportAcc);
+         });
+      }
+   }
+
    async function runAudit() {
       const fileInput = document.getElementById('fileItem');
       const output = document.getElementById('output');
       const statusText = document.getElementById('status-text');
       const statusLight = document.getElementById('status-light');
-      
       const file = fileInput.files[0];
+
       if (!file) { alert("Selecione um arquivo!"); return; }
 
       currentFileName = file.name.split('.')[0];
       auditData = []; 
-      output.innerText = "⌛ Iniciando varredura profunda (Deep Crawl)...";
+      output.innerText = "⌛ Realizando Deep Scan (Mapeando sub-estruturas)...";
       statusLight.classList.add('active');
-      statusText.innerText = "Acessando blocos binários...";
+      statusText.innerText = "Lendo hierarquia binária...";
 
       try {
          const f = await openFile(file);
-         let report = `INVESTIGANDO: ${file.name}\n${"=".repeat(80)}\n\n`;
+         let report = `INVESTIGANDO: ${file.name}\n${"=".repeat(100)}\n\n`;
 
-         async function scanTrees(path = "") {
-            const dir = (path === "") ? f : await f.readDirectory(path);
-            const keys = dir.fKeys;
-            for (let key of keys) {
-               const fullPath = path === "" ? key.fName : `${path}/${key.fName}`;
-               if (key.fClassName === "TTree") {
-                  const tree = await f.readObject(fullPath);
-                  report += `> ÁRVORE: ${fullPath} (Eventos: ${tree.fEntries})\n`;
-                  auditData.push({type: "TTree", name: fullPath, info: `Entries: ${tree.fEntries}`});
-                  if (tree.fBranches) {
-                     tree.fBranches.arr.forEach(br => {
-                        const tipo = br.fClassName || "Primitive";
-                        report += `  Branch: ${br.fName.padEnd(45)} | ${tipo}\n`;
-                        auditData.push({type: "Branch", name: `${fullPath}/${br.fName}`, info: tipo});
-                     });
-                  }
-                  report += "\n";
-               } else if (key.fClassName.startsWith("TDirectory")) {
-                  await scanTrees(fullPath);
+         const keys = f.fKeys;
+         
+         // Varredura de Trees
+         for (let key of keys) {
+            if (key.fClassName === "TTree") {
+               const tree = await f.readObject(key.fName);
+               report += `> ÁRVORE: ${key.fName} (Eventos: ${tree.fEntries})\n`;
+               report += `  ${"Branch".padEnd(62)} | ${"Tipo (Typename)".padEnd(30)}\n`;
+               report += "-".repeat(100) + "\n";
+               
+               let reportAcc = { text: "" };
+               if (tree.fBranches && tree.fBranches.arr) {
+                  tree.fBranches.arr.forEach(br => inspectBranches(br, "", reportAcc));
                }
+               report += reportAcc.text + "\n";
             }
          }
 
-         async function scanHistograms(path = "") {
-            const dir = (path === "") ? f : await f.readDirectory(path);
-            const keys = dir.fKeys;
+         // Varredura de Histogramas (Busca recursiva em pastas)
+         async function scanHists(dir, path = "") {
+            const keys = dir.fKeys || [];
             for (let key of keys) {
                const fullPath = path === "" ? key.fName : `${path}/${key.fName}`;
                if (key.fClassName.startsWith("TH")) {
                   report += `[HIST] ${fullPath.padEnd(55)} | ${key.fClassName}\n`;
                   auditData.push({type: "Histogram", name: fullPath, info: key.fClassName});
                } else if (key.fClassName.startsWith("TDirectory")) {
-                  await scanHistograms(fullPath);
+                  const subDir = await f.readDirectory(fullPath);
+                  await scanHists(subDir, fullPath);
                }
             }
          }
 
-         await scanTrees();
          report += `--- [ ESTRUTURA DE HISTOGRAMAS ] ---\n`;
-         await scanHistograms();
+         await scanHists(f);
 
-         report += "\n" + "=".repeat(80) + "\nAUDITORIA CONCLUÍDA.";
+         report += "\n" + "=".repeat(100) + "\nAUDITORIA CONCLUÍDA.";
          output.innerText = report;
-         statusText.innerText = "Análise finalizada.";
+         statusText.innerText = "Concluído.";
          statusLight.classList.remove('active');
 
       } catch (err) {
-         output.innerText = "ERRO NA LEITURA: " + err.message;
-         statusText.innerText = "Erro no arquivo.";
+         output.innerText = "ERRO: " + err.message;
          statusLight.classList.remove('active');
       }
    }
