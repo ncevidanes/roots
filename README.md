@@ -1,6 +1,6 @@
 # Spy Root Universal 🔬
 
-[![DOI](https://zenodo.org/badge/1150950905.svg)](https://doi.org/10.5281/zenodo.20479447)
+[![DOI](https://zenodo.org/badge/1150950905.svg)](https://doi.org/10.5281/zenodo.20507908)
 
 Uma ferramenta de auditoria e inspeção visual para arquivos binários `.root` (CERN), executada **100% no lado do cliente (Client-Side)** diretamente através do navegador. 
 
