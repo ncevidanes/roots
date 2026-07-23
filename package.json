@@ -1,0 +1,14 @@
+{
+  "name": "spy-root-universal",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Auditoria recursiva client-side de arquivos ROOT com JSROOT.",
+  "scripts": {
+    "test": "node --test",
+    "serve": "python3 -m http.server 8000"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

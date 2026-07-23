@@ -1,68 +1,108 @@
-# Spy Root Universal 🔬
+# Spy Root Universal 1.1
 
-[![DOI](https://zenodo.org/badge/1150950905.svg)](https://doi.org/10.5281/zenodo.20507908)
+Aplicação web estática para auditar a estrutura de arquivos binários ROOT no
+navegador. O conteúdo dos arquivos selecionados é processado localmente com
+JSROOT 7.11.0.
 
-Uma ferramenta de auditoria e inspeção visual para arquivos binários `.root` (CERN), executada **100% no lado do cliente (Client-Side)** diretamente através do navegador. 
+## O que mudou nesta versão
 
-**🌐 Demonstração Online:** [ncevidanes.github.io/roots/](https://ncevidanes.github.io/roots/)
+- varredura recursiva de todos os `TDirectory`;
+- descoberta de `TTree` e `TNtuple` em qualquer nível;
+- catalogação de todas as chaves ROOT, inclusive classes desconhecidas;
+- classificação de histogramas, perfis, gráficos, funções, eficiências,
+  canvases, geometrias, coleções e metadados;
+- visualização das classes com suporte de desenho conhecido no JSROOT;
+- seleção e auditoria sequencial de até 20 arquivos;
+- construção segura do relatório com DOM, sem inserir nomes ROOT em
+  `innerHTML`;
+- exportação CSV com escape de campos e proteção contra fórmulas;
+- JSROOT fixado na versão 7.11.0;
+- testes automatizados para classificação, caminhos, branches, recursão e CSV.
 
----
+Classes não reconhecidas continuam aparecendo como **Outro objeto**. A aplicação
+não tenta desenhá-las automaticamente, mas preserva classe, caminho, ciclo,
+título e tamanho da chave no relatório.
 
-## 🎯 Objetivo do Projeto
-
-Este projeto foi desenvolvido para resolver uma demanda clássica em ambientes de Física de Altas Energias: a necessidade de inspecionar a estrutura de um arquivo `.root` sem precisar abrir um terminal Linux, carregar ambientes virtuais complexos ou compilar macros em C++. 
-
-O **Spy Root Universal** atua como um auditor leve e agnóstico, focado estritamente na inspeção de metadados, mapeamento de hierarquias de `TTrees` e renderização de histogramas nativos pré-existentes no arquivo.
-
----
-
-## ✨ Funcionalidades Principais
-
-* **Auditoria de Hierarquia Bruta (Deep Scan):** A ferramenta realiza a varredura acessando o array binário interno de chaves (`fBranches.arr`) do arquivo ROOT. Isso garante o mapeamento de branches complexas e estruturadas, comuns em ambientes de dados do ATLAS/CERN.
-* **Mapeamento de Objetos:** Varredura recursiva de diretórios (`TDirectory`) dentro do arquivo binário para catalogação de chaves e histogramas.
-* **Visualização Interativa:** Renderização instantânea de histogramas (`TH1D`, `TH2D`, etc.) gravados no arquivo através de cliques diretos na árvore de metadados.
-* **Exportação de Auditoria (CSV):** Geração automática de relatórios textuais da estrutura mapeada para fins de documentação, validação e governança de repositórios de dados.
-* **Privacidade e Zero Servidor:** O processamento ocorre inteiramente na memória RAM local do seu navegador. Nenhum dado ou arquivo é enviado para servidores externos.
-
----
-
-## 🛠️ Arquitetura Técnica
-
-A implementação é **100% contida em um único arquivo HTML (`index.html`)**, eliminando a necessidade de servidores backend, ambientes Node.js ou gerenciadores de pacotes pesados.
-
-* **Interface:** Desenvolvida em HTML5 e CSS3 nativos com um layout escuro de alta legibilidade para terminais técnicos.
-* **Motor de Leitura Binária:** Utilização dos módulos nativos ES6 do **JSROOT (CERN)** carregados via CDN.
-* **Gerenciamento de Memória:** Rotinas explícitas de `cleanup()` disparadas a cada nova plotagem ou troca de arquivo, mitigando o vazamento de memória (*memory leaks*) ao manipular arquivos binários volumosos.
-
----
-
-## 🚀 Como Executar Localmente
-
-Por se basear exclusivamente em tecnologias web padrão, a execução local não exige instalação:
-
-1. Baixe o arquivo `index.html` deste repositório.
-2. Abra o arquivo diretamente em qualquer navegador moderno (Chrome, Firefox, Edge, Safari).
-3. Selecione seu arquivo `.root` local para iniciar a investigação técnica.
-
-*Nota: É necessária uma conexão ativa com a internet para que o navegador carregue os módulos do JSROOT diretamente da infraestrutura do CERN.*
-
----
-
-## 📊 Estrutura de Saída do Relatório
-
-Ao processar um arquivo, a ferramenta renderiza a estrutura técnica no painel do console integrado da seguinte forma:
+## Estrutura
 
 ```text
-INVESTIGANDO: dado_analise.root
-============================================================
+index.html
+styles.css
+src/
+  app.js
+  application/
+    audit-service.js
+    root-structure-scanner.js
+  domain/
+    audit-entry.js
+    branch-scanner.js
+    root-object-classifier.js
+    root-path.js
+  infrastructure/
+    audit-csv.js
+    jsroot-adapter.js
+  presentation/
+    object-viewer.js
+    report-view.js
+    status-view.js
+tests/
+```
 
-🌳 ÁRVORE ENCONTRADA: NomeDaTree (X eventos)
-Branch                                             | Tipo
-------------------------------------------------------------
-  - NomeDaBranch_A                                 | TBranch
-  - NomeDaBranch_B                                 | TBranch
+As responsabilidades e decisões de projeto estão detalhadas em
+[`docs/architecture.md`](docs/architecture.md).
 
---- [ ESTRUTURA DE HISTOGRAMAS (CLIQUE PARA PLOTAR) ] ---
-[HIST] nome_do_histograma                          | TH1D
-============================================================
-AUDITORIA CONCLUÍDA.
+## Executar localmente
+
+Os módulos ES6 devem ser servidos por HTTP. No diretório do projeto:
+
+```bash
+python3 -m http.server 8000
+```
+
+Abra:
+
+```text
+http://localhost:8000
+```
+
+Também é possível executar:
+
+```bash
+npm run serve
+```
+
+Não existem dependências npm de produção. Uma conexão com a internet é
+necessária para carregar o módulo JSROOT 7.11.0 da infraestrutura do CERN.
+
+## Testes
+
+Requisito: Node.js 20 ou posterior.
+
+```bash
+npm test
+```
+
+Os testes usam adaptadores ROOT simulados e não enviam nem modificam arquivos
+reais.
+
+## Publicar no GitHub Pages
+
+Copie o conteúdo desta pasta para a raiz do repositório ou para a branch
+configurada como fonte do GitHub Pages. O `index.html` é o ponto de entrada e
+usa apenas caminhos relativos.
+
+## Limites deliberados
+
+- `TTree` e `TNtuple` têm sua estrutura de branches catalogada, mas não são
+  desenhados sem que o usuário forneça uma expressão;
+- `RNTuple` é catalogado como estrutura colunar, mas sua árvore de campos ainda
+  não é expandida nesta versão;
+- objetos desconhecidos são catalogados, mas não desenhados;
+- os arquivos são auditados sequencialmente para reduzir picos de memória;
+- o limite padrão é de 20 arquivos por auditoria.
+
+## Referências
+
+- [Manual do JSROOT](https://root.cern/manual/jsroot/)
+- [JSROOT 7.11.0](https://root.cern/js/7.11.0/)
+- [Classes suportadas pelo JSROOT](https://github.com/root-project/jsroot/blob/master/docs/JSROOT.md#supported-root-classes-by-jsroot)
