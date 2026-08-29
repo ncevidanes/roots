@@ -101,6 +101,13 @@ usa apenas caminhos relativos.
 - os arquivos são auditados sequencialmente para reduzir picos de memória;
 - o limite padrão é de 20 arquivos por auditoria.
 
+## Dados ROOT
+
+Arquivos ROOT selecionados pelo usuário são dados locais e não fazem parte dos
+requisitos de execução ou da suíte automatizada de testes. A política para
+fixtures e dados binários está documentada em
+[`docs/data-policy.md`](docs/data-policy.md).
+
 ## Referências
 
 - [Manual do JSROOT](https://root.cern/manual/jsroot/)
